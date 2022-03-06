@@ -6,6 +6,7 @@ import time
 import argparse
 from random import randint
 from utils_demo import *
+import ftfy
 
 parser = argparse.ArgumentParser(description='Bruteforce attack against randomized AES-128-CTR.')
 parser.add_argument('-n', type=int,
@@ -46,9 +47,9 @@ nonce2 = read_bytes(fn = args.n2)
 nonce3 = read_bytes(fn = args.n3)
 
 #Reading plaintexts from files. 
-plaintext1 = read_file(fn = args.m1)
-plaintext2 = read_file(fn = args.m2)
-plaintext3 = read_file(fn = args.m3)
+plaintext1 = ftfy.fix_text(read_file(fn = args.m1))
+plaintext2 = ftfy.fix_text(read_file(fn = args.m2))
+plaintext3 = ftfy.fix_text(read_file(fn = args.m3))
 
 max_key_value = 2**24 - 1	#The max value the last 3 bytes can have
 base_key = 2**127	#128 bit key, 1 in the first spot means 2^127
@@ -62,14 +63,14 @@ for i in range(max_key_value):
 	#Attempt to decode with this key
 	#This might fail with incorrect keys because of UTF-8 encoding
 	try:
-		p1_attempt = decryptor_CTR(ciphertext1, nonce1, key).decode()
+		p1_attempt = ftfy.fix_text(decryptor_CTR(ciphertext1, nonce1, key).decode())
 
 		print(str(p1_attempt) + " ?= " + str(plaintext1))
 
 		#Compare all decrypted plaintexts to actual plaintexts
 		if p1_attempt == plaintext1:
-			p2_attempt = decryptor_CTR(ciphertext2, nonce2, key).decode()
-			p3_attempt = decryptor_CTR(ciphertext3, nonce3, key).decode()
+			p2_attempt = ftfy.fix_text(decryptor_CTR(ciphertext2, nonce2, key).decode())
+			p3_attempt = ftfy.fix_text(decryptor_CTR(ciphertext3, nonce3, key).decode())
 
 			print(str(p2_attempt) + " ?= " + str(plaintext2))
 			print(str(p3_attempt) + " ?= " + str(plaintext3))
